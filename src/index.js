@@ -5,10 +5,12 @@ const getOptions = ({
   peerSpec=null,
   actions=[],
   signaling='ws://localhost:3000',
+  room='default',
 }={}) => ({
   peerSpec,
   actions,
   signaling,
+  room,
 });
 
 const getSignalingServer = signaling => {
@@ -18,7 +20,7 @@ const getSignalingServer = signaling => {
   return signaling;
 };
 
-function start(server, {
+function start(server, room, {
   peerSpec,
   onServerConnection,
   onPeerData,
@@ -28,6 +30,7 @@ function start(server, {
 }={}) {
   const signal = (type, origin, target, data) => server.send(JSON.stringify({
     type,
+    room,
     origin,
     target,
     data,
@@ -80,16 +83,28 @@ function start(server, {
       }
     }
   });
-  return { peers, pid };
+  return {
+    get peerId() {
+      return pid;
+    },
+    send(id, data) {
+      peers.get(id).send(JSON.stringify(data));
+    },
+    broadcast(data) {
+      for (const peer of peers.values()) {
+        peer.send(JSON.stringify(data));
+      }
+    },
+  };
 }
 
 const rehub = options => {
-  const { peerSpec, actions, signaling } = getOptions(options);
+  const { peerSpec, actions, signaling, room } = getOptions(options);
   const whitelist = new Set(actions);
   const server = getSignalingServer(signaling);
   return store => {
-    const { peers, pid } = start(server, {
-      onServerConnection() { store.dispatch({ type: '@@REHUB/CONNECTED', payload: { id: pid }}) },
+    const com = start(server, room, {
+      onServerConnection() { store.dispatch({ type: '@@REHUB/CONNECTED', payload: { id: com.peerId }}) },
       onPeerOpen(id) { store.dispatch({ type: '@@REHUB/PEER_OPEN', payload: { id } }) },
       onPeerClose(id) { store.dispatch({ type: '@@REHUB/PEER_CLOSE', payload: { id } }) },
       onPeerData(id, action) {
@@ -100,8 +115,10 @@ const rehub = options => {
     });
     return next => action => {
       if (whitelist.has(action.type) && !action.peer) {
-        for (const peer of peers.values()) {
-          peer.send(JSON.stringify(action));
+        if (action.targets) {
+          action.targets.forEach(t => com.send(action));
+        } else {
+          com.broadcast(action);
         }
       }
       next(action);
