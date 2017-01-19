@@ -1,6 +1,6 @@
 {
   "name": "rehub",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A Redux middleware to share actions via WebRTC",
   "main": "index.js",
   "scripts": {

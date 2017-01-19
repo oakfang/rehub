@@ -116,7 +116,7 @@ const rehub = options => {
     return next => action => {
       if (whitelist.has(action.type) && !action.peer) {
         if (action.targets) {
-          action.targets.forEach(t => com.send(action));
+          action.targets.forEach(t => com.send(t, action));
         } else {
           com.broadcast(action);
         }

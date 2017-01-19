@@ -177,7 +177,7 @@ var rehub = function rehub(options) {
         if (whitelist.has(action.type) && !action.peer) {
           if (action.targets) {
             action.targets.forEach(function (t) {
-              return com.send(action);
+              return com.send(t, action);
             });
           } else {
             com.broadcast(action);
