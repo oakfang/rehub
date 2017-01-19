@@ -1,0 +1,36 @@
+{
+  "name": "rehub",
+  "version": "0.1.0",
+  "description": "A Redux middleware to share actions via WebRTC",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "babel src/index.js --out-file=index.js --presets=es2015"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oakfang/rehub.git"
+  },
+  "keywords": [
+    "WebRTC",
+    "redux",
+    "middleware",
+    "peer",
+    "p2p"
+  ],
+  "author": "Alon Niv",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/oakfang/rehub/issues"
+  },
+  "homepage": "https://github.com/oakfang/rehub#readme",
+  "devDependencies": {
+    "babel-cli": "^6.18.0",
+    "babel-preset-es2015": "^6.18.0"
+  },
+  "dependencies": {
+    "simple-peer": "^6.2.1",
+    "uuid": "^3.0.1",
+    "ws": "^1.1.1"
+  }
+}
